@@ -2,6 +2,8 @@
 MEMORY.*
 data/
 paper/
+.*.s[a-z][a-z]
+.tmuxp.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
