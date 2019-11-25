@@ -1,0 +1,19 @@
+The general idea I'm going for is to have simple way of generating a
+large number of files that follow a good PyTorch style of doing things.
+
+Have a class called Unit
+with params 
+    name: (name of the class object that is going to be generated)
+    params: (dict containing the params and their default values)
+    inshape:
+    outshape:
+    (additional members to indicate any in-between processing)
+
+for example, if there is a linear node after conv node, you have to 
+ensure the shapes will be rearranged properly.
+
+then you can have random generators that are basically factories 
+for producing Units with the desired properties (Activation units, conv units, rnn units, etc.).
+
+Set members for these random generators that can limit how much randomness can happen 
+(kernel sizes, bias or not)
