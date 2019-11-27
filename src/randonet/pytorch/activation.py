@@ -145,7 +145,7 @@ class ELU(_Factory):
         _Factory.__init__(self)
         self.template_fn = namedtuple("ELU", ["alpha", "inplace"])
         self.params = self.template_fn(
-            alpha=IntParam(name="alpha", default=1.0),
+            alpha=FloatParam(name="alpha", default=1.0),
             inplace=BinaryParam(name="inplace", default=False, true_prob=0.5),
         )
         for k, v in kwargs.items():
@@ -157,7 +157,7 @@ class CELU(_Factory):
         _Factory.__init__(self)
         self.template_fn = namedtuple("CELU", ["alpha", "inplace"])
         self.params = self.template_fn(
-            alpha=IntParam(name="alpha", default=1.0),
+            alpha=FloatParam(name="alpha", default=1.0),
             inplace=BinaryParam(name="inplace", default=False, true_prob=0.5),
         )
         for k, v in kwargs.items():
@@ -181,7 +181,7 @@ class Softplus(_Factory):
         _Factory.__init__(self)
         self.template_fn = namedtuple("Softplus", ["beta", "threshold"])
         self.params = self.template_fn(
-            beta=IntParam(name="beta", default=1),
+            beta=FloatParam(name="beta", default=1),
             threshold=IntParam(name="threshold", default=20),
         )
         for k, v in kwargs.items():

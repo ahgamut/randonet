@@ -102,6 +102,9 @@ class ChoiceParam(Param):
         self.choices = choices
         self.cprobs = cprobs
 
+    def draw_next(self):
+        self.val = self.choices[(self.choices.index(self.val) + 1) % len(self.choices)]
+
     def generate(self):
         x = random.uniform(0, 1)
         ans = 0

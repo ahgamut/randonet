@@ -18,6 +18,17 @@ class ConvBaseFactory(_Factory):
             raise NotImplementedError("Need to fix shaping issues")
         return _in_shape
 
+    def __call__(self, _in_shape, _out_shape=None):
+        in_shape = self._fix_inshape(_in_shape)
+        self.params.in_channels.val = in_shape[0]
+        fn = self._render()
+        if _out_shape is not None:
+            fn = self._lock_kernel(fn, in_shape, _out_shape)
+            out_shape = _out_shape
+        else:
+            out_shape = self._get_outshape(fn, in_shape)
+        return Unit(fn, in_shape, out_shape)
+
 
 class ConvFactory(ConvBaseFactory):
     def _get_outshape(self, fn, in_shape):
@@ -36,7 +47,7 @@ class ConvFactory(ConvBaseFactory):
         ):
             k = 1 + (strid + s + 2 * pad - 1 - o * strid) // dil
             ksize.append(k)
-        return fn.replace(
+        return fn._replace(
             in_channels=in_shape[0], out_channels=out_shape[0], kernel_size=tuple(ksize)
         )
 
@@ -68,6 +79,6 @@ class ConvTransposeFactory(ConvBaseFactory):
         ):
             k = 1 + (o - (s - 1) * strid + 2 * pad - opad - 1) // dil
             ksize.append(o)
-        return fn.replace(
+        return fn._replace(
             in_channels=in_shape[0], out_channels=out_shape[0], kernel_size=tuple(ksize)
         )
