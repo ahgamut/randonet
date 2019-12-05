@@ -2,6 +2,7 @@
 MEMORY.*
 data/
 paper/
+samples/
 .*.s[a-z][a-z]
 .tmuxp.yaml
 

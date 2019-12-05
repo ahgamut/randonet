@@ -7,6 +7,8 @@
 """
 import torch
 from torch import nn
+{%- block imports %}
+{%- endblock %}
 
 class {{ name }}(nn.Module):
     def __init__(self):

@@ -27,7 +27,7 @@ class ActivationParam(ChoiceParam):
         ChoiceParam.__init__(
             self,
             name="Activation",
-            choices=[Sigmoid, Tanh, ReLU, ReLU6, SELU],
-            cprobs=[i / 5 for i in range(1, 10)],
+            choices=[Sigmoid(), Tanh(), ReLU(), SELU()],
+            cprobs=[i / 4 for i in range(1, 5)],
             is_random=False,
         )

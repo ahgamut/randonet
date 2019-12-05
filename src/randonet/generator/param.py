@@ -61,6 +61,8 @@ class IntParam(Param):
         self.limits = limits
 
     def generate(self):
+        if self.limits[0] == self.limits[1]:
+            return self.limits[0]
         return random.randint(self.limits[0], self.limits[1])
 
 
@@ -70,6 +72,8 @@ class FloatParam(Param):
         self.limits = limits
 
     def generate(self):
+        if self.limits[0] == self.limits[1]:
+            return self.limits[0]
         return random.uniform(self.limits[0], self.limits[1])
 
 

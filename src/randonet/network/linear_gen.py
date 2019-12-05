@@ -9,7 +9,7 @@
     :license: see LICENSE for more details.
 """
 from randonet.pytorch import Linear
-from randonet.network import ActivationParam
+from randonet.network.activation import ActivationParam
 from randonet.generator.param import BinaryParam
 from randonet.network.abstract import AbstractNet as _Net
 
@@ -50,15 +50,18 @@ class LinearOnly(_Net):
         return unit_list
 
     def __call__(self, num_nets, startnum=1):
-        if self.layers[0].bias.is_random:
+        t = self.layers[0].bias
+        if t.is_random and t.true_prob > 0:
             if "Only" in self.name:
                 self.name = self.name.replace("Only", "Bias")
-            else:
+            elif "Bias" not in self.name:
                 self.name = self.name + "Bias"
-        _Net.__call__(self, num_nets, startnum)
+        return _Net.__call__(self, num_nets, startnum)
 
 
 class LinearAC(LinearOnly):
+    ac = ActivationParam()
+
     def __init__(
         self,
         start_shape,
@@ -71,8 +74,7 @@ class LinearAC(LinearOnly):
         LinearOnly.__init__(
             self, start_shape, stop_shape, min_features, max_features, depth, bias_prob
         )
-        self.ac = ActivationParam()
-        self.use_ac = BinaryParam()
+        self.use_ac = BinaryParam(name="")
         self.use_ac.randomize(true_prob=0.7)
 
     def generate(self):
@@ -88,8 +90,10 @@ class LinearAC(LinearOnly):
             else:
                 out_shape = None
             unit_list.append(self.layers[0](in_shape, out_shape))
-            if self.use_ac.value:
-                unit_list.append(self.ac.val(out_shape, out_shape))
+            if self.use_ac.value and out_shape is None:
+                unit_list.append(
+                    self.ac.val(unit_list[-1].out_shape, unit_list[-1].out_shape)
+                )
             self.layers[0].out_features.limits = (limits[0], unit_list[-1].out_shape[0])
 
         self.layers[0].out_features.limits = limits
@@ -97,4 +101,4 @@ class LinearAC(LinearOnly):
 
     def __call__(self, num_nets, startnum=1):
         self.name = "Linear{}".format(self.ac.val.__class__.__name__)
-        return LinearOnly.__call__(self, num_nets, startnum)
+        return _Net.__call__(self, num_nets, startnum)

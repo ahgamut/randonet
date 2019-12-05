@@ -11,6 +11,7 @@
 from randonet.pytorch import Conv1d, Conv2d, Conv3d
 from randonet.network.activation import ActivationParam
 from randonet.network.abstract import AbstractNet as _Net
+from randonet.generator.param import BinaryParam
 
 
 class ConvOnly(_Net):
@@ -31,6 +32,7 @@ class ConvOnly(_Net):
             t.randomize(**v)
 
     def generate(self):
+        limits = self.layers[0].kernel_size.limits
         unit_list = []
         for j in range(self.depth):
             if j == 0:
@@ -42,28 +44,34 @@ class ConvOnly(_Net):
             else:
                 out_shape = None
             unit_list.append(self.layers[0](in_shape, out_shape))
+            out_shape = unit_list[-1].out_shape
             t = len(out_shape) - 1
             self.layers[0].kernel_size.randomize(
                 limits=((1,) * t, (min(out_shape[1:]),) * t)
             )
+        self.layers[0].kernel_size.randomize(limits=limits)
+        return unit_list
 
     def __call__(self, num_nets, startnum=1):
-        if self.layers[0].bias.is_random:
+        t = self.layers[0].bias
+        if t.is_random and t.true_prob > 0:
             if "Only" in self.name:
                 self.name = self.name.replace("Only", "Bias")
-            else:
+            elif "Bias" not in self.name:
                 self.name = self.name + "Bias"
-        _Net.__call__(self, num_nets, startnum)
+        return _Net.__call__(self, num_nets, startnum)
 
 
 class ConvAC(ConvOnly):
+    ac = ActivationParam()
+
     def __init__(self, start_shape, stop_shape, depth, convclass, bias_prob):
         ConvOnly.__init__(self, start_shape, stop_shape, depth, convclass, bias_prob)
-        self.ac = ActivationParam()
-        self.use_ac = BinaryParam()
+        self.use_ac = BinaryParam(name="")
         self.use_ac.randomize(true_prob=0.7)
 
     def generate(self):
+        limits = self.layers[0].kernel_size.limits
         unit_list = []
         for j in range(self.depth):
             if j == 0:
@@ -75,16 +83,23 @@ class ConvAC(ConvOnly):
             else:
                 out_shape = None
             unit_list.append(self.layers[0](in_shape, out_shape))
-            if self.use_ac.value:
-                unit_list.append(self.ac.val(out_shape, out_shape))
+            if self.use_ac.value and out_shape is None:
+                unit_list.append(
+                    self.ac.val(unit_list[-1].out_shape, unit_list[-1].out_shape)
+                )
+            out_shape = unit_list[-1].out_shape
             t = len(out_shape) - 1
             self.layers[0].kernel_size.randomize(
                 limits=((1,) * t, (min(out_shape[1:]),) * t)
             )
+        self.layers[0].kernel_size.randomize(limits=limits)
+        return unit_list
 
     def __call__(self, num_nets, startnum=1):
-        self.name = "Conv{}".format(self.ac.val.__class__.__name__)
-        return ConvOnly.__call__(self, num_nets, startnum)
+        self.name = "{}".format(
+            self.__class__.__name__.replace("AC", self.ac.val.__class__.__name__)
+        )
+        return _Net.__call__(self, num_nets, startnum)
 
 
 class Conv1dOnly(ConvOnly):
