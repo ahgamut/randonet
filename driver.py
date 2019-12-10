@@ -11,6 +11,7 @@ from randonet.network import (
     Conv1dThenLinear,
     Conv2dThenLinear,
     Conv3dThenLinear,
+    ResNetStyle,
 )
 from randonet.pytorch.activation import LogSoftmax
 from jinja2 import Environment, select_autoescape, PackageLoader
@@ -46,6 +47,7 @@ comp_list = (
     Conv1dThenLinear(depth=2),
     Conv2dThenLinear(depth=2),
     Conv3dThenLinear(depth=2),
+    ResNetStyle(start_shape=(1, 28, 28), stop_shape=(10,), depth=2),
 )
 
 start = 1
@@ -86,7 +88,7 @@ def ac(depth=2):
 def main():
     global start, num_nets
     l2 = []
-    for depth in range(2, 3):
+    for depth in range(2, 7):
         l2 = l2 + ac(depth)
         l2 = l2 + gen(depth)
         start = start + num_nets

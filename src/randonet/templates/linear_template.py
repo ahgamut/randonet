@@ -7,7 +7,11 @@ from torchvision.models.resnet import BasicBlock
 
 {%- block init %}
         {%- for f in layers %}
+        {%- if "BasicBlock" in f|string %}
+        self.f{{ loop.index0 }} = {{ f | string }}
+        {%- else %}
         self.f{{ loop.index0 }} = nn.{{ f|string }}
+        {%- endif %}
         {%- endfor %}
 {% endblock %}
 

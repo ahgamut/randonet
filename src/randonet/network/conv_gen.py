@@ -18,11 +18,7 @@ class ConvOnly(_Net):
     def __init__(self, start_shape, stop_shape, depth, convclass, bias_prob=0):
         _Net.__init__(self, start_shape, stop_shape, depth)
         self.layers = [convclass()]
-        t = len(self.start_shape) - 1
         self.layers[0].out_channels.randomize(limits=(self.stop_shape[0], 64))
-        self.layers[0].kernel_size.randomize(
-            limits=((1,) * t, (min(self.start_shape[1:]),) * t)
-        )
         if bias_prob > 0:
             self.layers[0].bias.randomize(true_prob=bias_prob)
 
@@ -32,6 +28,10 @@ class ConvOnly(_Net):
             t.randomize(**v)
 
     def generate(self):
+        t = len(self.start_shape) - 1
+        self.layers[0].kernel_size.randomize(
+            limits=((1,) * t, (min(self.start_shape[1:]),) * t)
+        )
         limits = self.layers[0].kernel_size.limits
         unit_list = []
         for j in range(self.depth):
@@ -71,6 +71,10 @@ class ConvAC(ConvOnly):
         self.use_ac.randomize(true_prob=0.7)
 
     def generate(self):
+        t = len(self.start_shape) - 1
+        self.layers[0].kernel_size.randomize(
+            limits=((1,) * t, (min(self.start_shape[1:]),) * t)
+        )
         limits = self.layers[0].kernel_size.limits
         unit_list = []
         for j in range(self.depth):
