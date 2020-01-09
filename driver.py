@@ -76,9 +76,21 @@ def gen(depth=2):
 def ac(depth=2):
     l2 = []
     for a in LinearAC.ac.choices:
-        for g in ac_list + comp_list:
+        for g in ac_list:
             g.depth = depth
             l = g(num_nets=num_nets, startnum=start)
+            l2 = l2 + [write_template(x) for x in l]
+        Conv1dAC.ac.draw_next()
+        LinearAC.ac.draw_next()
+    return l2
+
+
+def comp(depth=2):
+    l2 = []
+    for k, a in enumerate(LinearAC.ac.choices):
+        for g in comp_list:
+            g.depth = depth
+            l = g(num_nets=num_nets, startnum=(start - 1) * 4 + 1 + k * 5)
             l2 = l2 + [write_template(x) for x in l]
         Conv1dAC.ac.draw_next()
         LinearAC.ac.draw_next()
@@ -91,6 +103,7 @@ def main():
     for depth in range(2, 7):
         l2 = l2 + ac(depth)
         l2 = l2 + gen(depth)
+        l2 = l2 + comp(depth)
         start = start + num_nets
 
     print(len(l2), "networks generated")

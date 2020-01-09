@@ -70,10 +70,10 @@ class ConvAC(ConvOnly):
         self.use_ac = BinaryParam(name="")
         self.use_ac.randomize(true_prob=0.7)
 
-    def generate(self):
+    def generate(self, resnet_cover=256):
         t = len(self.start_shape) - 1
         self.layers[0].kernel_size.randomize(
-            limits=((1,) * t, (min(self.start_shape[1:]),) * t)
+            limits=((1,) * t, (min(list(self.start_shape[1:]) + [resnet_cover]),) * t)
         )
         limits = self.layers[0].kernel_size.limits
         unit_list = []

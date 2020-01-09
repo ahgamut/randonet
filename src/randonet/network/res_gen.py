@@ -51,7 +51,7 @@ class ResNetStyle(_Net):
         LinearAC.ac.val = LinearAC.ac.choices[2]
         self.change_num.randomize(limits=(1, self.depth - 2 * self.depth // 3))
         t = self.change_num.value
-        cp = self.layers[0].generate()[:t]
+        cp = self.layers[0].generate(resnet_cover=20)[:t]
 
         skip_gen = BasicBlock()
         self.change_num.randomize(
